@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "498197770574",
+    "project_id": "studyshelf-22adc",
+    "storage_bucket": "studyshelf-22adc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:498197770574:android:7b3fa17bb425138329ee1f",
+        "android_client_info": {
+          "package_name": "com.example.studyshelf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClXTYqs0wrgEN4_DB1kKeNVBi5An7vTZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
