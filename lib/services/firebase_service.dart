@@ -35,8 +35,8 @@ class FirebaseService {
       }
     } catch (e) {
       print("Error en el registro: $e");
-      return null;
     }
+    return null;
   }
 
   // Inicio de Sesion
@@ -98,7 +98,7 @@ class FirebaseService {
   Future<void> updateProfileImageUrl(String uid, String imageUrl) async {
     try {
       await _firestore.collection('users').doc(uid).update({
-        'profileImageUrl': imageUrl,
+        'imageUrl': imageUrl,
       });
     } catch (e) {
       print("Error al actualizar la URL de la imagen de perfil: $e");

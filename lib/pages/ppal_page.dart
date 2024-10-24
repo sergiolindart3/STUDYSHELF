@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:studyshelf/pages/login_page.dart';
 import 'package:studyshelf/pages/register_page.dart';
-import 'package:studyshelf/pages/widgets/custom_buttom.dart';
+import 'package:studyshelf/pages/widgets/custom_button.dart';
 import 'package:get/get.dart'; // Importa Get para la navegación
 
 void main() {
@@ -54,7 +54,7 @@ class WelcomeScreen extends StatelessWidget {
                 SizedBox(height: 15),
 
                 // Botón de "Registrarse"
-                RegisterButton(
+                CustomButton(
                   text: "Registrarse",
                   onPressed: () {
                     Get.to(RegisterPage());
@@ -64,12 +64,14 @@ class WelcomeScreen extends StatelessWidget {
                 SizedBox(height: 15),
 
                 // Botón de "Iniciar sesión"
-                LoginButton(
+                CustomButton(
                   text: "Iniciar sesión",
                   onPressed: () {
                     Get.to(LoginPage());
                   },
-                ), // Solo pasamos el texto
+                  color: Color.fromARGB(255, 194, 194, 194),
+                  textColor: Color.fromARGB(255, 70, 70, 70),
+                ),
 
                 SizedBox(height: 20),
 

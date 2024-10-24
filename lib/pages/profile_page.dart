@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'dart:io';
 import 'package:studyshelf/models/user_model.dart';
 import 'package:studyshelf/pages/widgets/custom_text_field.dart';
-import 'package:studyshelf/pages/widgets/custom_buttom.dart';
+import 'package:studyshelf/pages/widgets/custom_button.dart';
 
 class Perfil extends StatefulWidget {
   const Perfil({super.key});
@@ -68,98 +68,99 @@ class _Perfil extends State<Perfil> {
 
   @override
   Widget build(BuildContext context) {
-    UserModel? user = _authController.userModel.value;
-
-    if (user == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perfil',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Imagen de perfil
-            GestureDetector(
-              onTap: _pickImage,
-              child: CircleAvatar(
-                radius: 80,
-                backgroundColor: _selectedImage == null && user.imageUrl == null
-                    ? const Color.fromARGB(
-                        255, 141, 192, 236) // Cambia el color de fondo a azul
-                    : null,
-                backgroundImage: _selectedImage != null
-                    ? FileImage(_selectedImage!)
-                    : (user.imageUrl != null
-                        ? NetworkImage(user.imageUrl!)
-                        : null), // Si no hay imagen, dejar el fondo vacío
-                child: _selectedImage == null && user.imageUrl == null
-                    ? const Icon(Icons.person,
-                        color: Colors.white,
-                        size:
-                            80) // Mostrar un ícono de persona si no hay imagen
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Campo de texto para el nombre
-            CustomTextField(
-              hintText: 'Nombre',
-              controller: _nameController,
-              obscureText: false,
-            ),
-            SizedBox(height: 10),
-
-            // Campo de texto para el apellido
-            CustomTextField(
-              hintText: 'Apellido',
-              controller: _lastNameController,
-              obscureText: false,
-            ),
-            SizedBox(height: 10),
-
-            // Campo de texto para el correo electrónico (usar el valor del usuario)
-            CustomTextField(
-              hintText: 'Correo Electrónico',
-              controller: TextEditingController(
-                  text: user.email), // Mostrar el correo del usuario
-              obscureText: false,
-              readOnly: true,
-            ),
-            SizedBox(height: 10),
-
-            // Campo de texto para el celular
-            CustomTextField(
-              hintText: 'Telefono',
-              controller: _phoneController,
-              obscureText: false,
-            ),
-            SizedBox(height: 20),
-
-            RegisterButton(
-              text: "Guardar Cambios",
-              onPressed: () {
-                _updateProfile();
-              },
-            ),
-            SizedBox(height: 10),
-
-            // Botón para cerrar sesión
-            ElevatedButton(
+          title: const Text('Perfil',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          actions: [
+            // Botón de icono de cerrar sesión
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Cerrar sesión',
               onPressed: () {
                 _authController.signOut();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // Color rojo para el botón
-              ),
-              child: Text('Cerrar sesión'),
             ),
-          ],
-        ),
+          ]),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Obx(() {
+          UserModel? user = _authController.userModel.value;
+
+          if (user == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return Column(
+            children: [
+              // Imagen de perfil
+              GestureDetector(
+                onTap: _pickImage,
+                child: CircleAvatar(
+                  radius: 80,
+                  backgroundColor: _selectedImage == null &&
+                          user.imageUrl == null
+                      ? const Color.fromARGB(
+                          255, 141, 192, 236) // Cambia el color de fondo a azul
+                      : null,
+                  backgroundImage: _selectedImage != null
+                      ? FileImage(_selectedImage!)
+                      : (user.imageUrl != null
+                          ? NetworkImage(user.imageUrl!)
+                          : null), // Si no hay imagen, dejar el fondo vacío
+                  child: _selectedImage == null && user.imageUrl == null
+                      ? const Icon(Icons.person,
+                          color: Colors.white,
+                          size:
+                              80) // Mostrar un ícono de persona si no hay imagen
+                      : null,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Campo de texto para el nombre
+              CustomTextField(
+                hintText: 'Nombre',
+                controller: _nameController,
+                obscureText: false,
+              ),
+              SizedBox(height: 10),
+
+              // Campo de texto para el apellido
+              CustomTextField(
+                hintText: 'Apellido',
+                controller: _lastNameController,
+                obscureText: false,
+              ),
+              SizedBox(height: 10),
+
+              // Campo de texto para el correo electrónico (usar el valor del usuario)
+              CustomTextField(
+                hintText: 'Correo Electrónico',
+                controller: TextEditingController(
+                    text: user.email), // Mostrar el correo del usuario
+                obscureText: false,
+                readOnly: true,
+              ),
+              SizedBox(height: 10),
+
+              // Campo de texto para el celular
+              CustomTextField(
+                hintText: 'Telefono',
+                controller: _phoneController,
+                obscureText: false,
+              ),
+              SizedBox(height: 20),
+
+              CustomButton(
+                text: "Guardar Cambios",
+                onPressed: () {
+                  _updateProfile();
+                },
+              ),
+              SizedBox(height: 10),
+            ],
+          );
+        }),
       ),
     );
   }

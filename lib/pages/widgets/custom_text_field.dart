@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+//import 'package:get/get.dart';
+//import 'dart:io';
+//import 'package:file_picker/file_picker.dart';
+//import 'package:studyshelf/controllers/project_controller.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hintText;
@@ -9,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final Widget? suffixIcon; // Agregamos el parámetro suffixIcon
   final Function(String)? onChanged; // Agregamos el parámetro onChanged
   final FocusNode? focusNode; // Agregamos el parámetro focusNode
+  final int maxLines;
 
   const CustomTextField({
     super.key,
@@ -20,6 +25,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon, // Constructor para suffixIcon
     this.onChanged, // Constructor para onChanged
     this.focusNode, // Constructor para focusNode
+    this.maxLines = 1,
   });
 
   @override
@@ -44,6 +50,7 @@ class CustomTextField extends StatelessWidget {
         obscureText: obscureText,
         readOnly: readOnly,
         enabled: enabled,
+        maxLines: maxLines,
         onChanged: onChanged, // Pasamos el onChanged al TextField
         focusNode: focusNode, // Asignamos el focusNode al TextField
         decoration: InputDecoration(

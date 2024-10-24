@@ -1,9 +1,9 @@
 class UserModel {
-  String uid;
-  String name;
-  String lastName;
-  String email;
-  String phone;
+  final String uid;
+  final String name;
+  final String lastName;
+  final String email;
+  final String phone;
   String? imageUrl;
 
   // Constructor

@@ -1,57 +1,53 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Item {
-  String id;
-  String imageUrl;
-  String detail;
-  int quantity;
-  double price;
-  bool isActive;
-  DateTime? purchaseDate; // Hacer purchaseDate opcional
-  String category;
+class ProjectModel {
+  final String id;
+  final String projectName;
+  final String description;
+  final String repoLink;
+  String? pdfFile;
+  List<String>? evidenceImages;
+  final String subject;
+  String? imgProjectUrl; // Nueva propiedad para la imagen del proyecto
 
   // Constructor
-  Item({
+  ProjectModel({
     required this.id,
-    required this.imageUrl,
-    required this.detail,
-    required this.quantity,
-    required this.price,
-    required this.isActive,
-    this.purchaseDate, // purchaseDate puede ser nulo
-    required this.category,
+    required this.projectName,
+    required this.description,
+    required this.repoLink,
+    this.pdfFile,
+    this.evidenceImages,
+    required this.subject,
+    this.imgProjectUrl, // Inicializar en el constructor
   });
 
-  // Método para convertir un documento de Firestore en una instancia de Item
-  factory Item.fromMap(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Item(
-      id: doc.id, // ID del documento
-      imageUrl: data['imageUrl'] ?? '',
-      detail: data['detail'] ?? '',
-      quantity: data['quantity'] ?? 0,
-      price: data['price'] != null ? data['price'].toDouble() : 0.0,
-      isActive: data['isActive'] ?? false,
-      // Verificamos si 'purchaseDate' no es nulo y lo convertimos a DateTime
-      purchaseDate: data['purchaseDate'] != null
-          ? (data['purchaseDate'] as Timestamp).toDate()
-          : null,
-      category: data['category'] ?? '',
-    );
-  }
-
-  // Método para convertir un objeto Item a Map (para guardar en Firestore)
+  // Método para convertir el ProjectModel a un Map para guardar en Firestore
   Map<String, dynamic> toMap() {
     return {
-      'imageUrl': imageUrl,
-      'detail': detail,
-      'quantity': quantity,
-      'price': price,
-      'isActive': isActive,
-      'purchaseDate':
-          purchaseDate != null ? Timestamp.fromDate(purchaseDate!) : null,
-      'category': category,
-      'createdAt': FieldValue.serverTimestamp(),
+      'id': id,
+      'projectName': projectName,
+      'description': description,
+      'repoLink': repoLink,
+      'pdfFile': pdfFile,
+      'evidenceImages': evidenceImages,
+      'subject': subject,
+      'imgProjectUrl': imgProjectUrl, // Incluir en el Map
     };
+  }
+
+  // Crear una instancia de ProjectModel desde Firestore (deserialización)
+  factory ProjectModel.fromMap(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return ProjectModel(
+      id: doc.id,
+      projectName: data['projectName'] ?? '',
+      description: data['description'] ?? '',
+      repoLink: data['repoLink'] ?? '',
+      pdfFile: data['pdfFile'],
+      evidenceImages: List<String>.from(data['evidenceImages'] ?? []),
+      subject: data['subject'] ?? '',
+      imgProjectUrl: data['imgProjectUrl'], // Deserializar la URL de la imagen
+    );
   }
 }

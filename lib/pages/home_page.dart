@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:studyshelf/controllers/auth_controller.dart';
-import 'package:studyshelf/pages/home_page.dart';
-import 'package:studyshelf/pages/inicio_page.dart';
+import 'package:studyshelf/pages/create_page.dart';
 import 'package:studyshelf/pages/profile_page.dart';
 import 'package:get/get.dart';
 
@@ -19,15 +18,22 @@ class _HomePageState extends State<HomePage> {
 
   // Lista de las páginas que se mostrarán en la navegación inferior
   final List<Widget> _pages = [
-    InicioPage(),
+    Center(child: Text('Inicio')),
     Center(child: Text('Buscar')),
-    Center(child: Text('Agregar nuevo')),
+    CrearProject(),
     Center(child: Text('Notificaciones')),
     Perfil()
   ];
 
-  void _onItemTapped(int index) {
+  // Pila para almacenar el historial de las páginas visitadas
+  final List<int> _pageHistory = [];
+
+  // Cambiar página y almacenar el índice anterior en el historial
+  void _changePage(int index) {
     setState(() {
+      if (_selectedIndex != index) {
+        _pageHistory.add(_selectedIndex);
+      }
       _selectedIndex = index;
     });
   }
@@ -35,7 +41,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex], // Página según la opción seleccionada
+      key: _scaffoldKey,
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages, // Mantiene el estado de las páginas
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -60,9 +70,10 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue, // Color cuando está seleccionado
-        unselectedItemColor: Colors.grey, // Color cuando no está seleccionado
-        onTap: _onItemTapped, // Cambiar de página al hacer tap
+        selectedItemColor: Colors.blue, // Color azul cuando está seleccionado
+        unselectedItemColor:
+            Colors.grey, // Color gris cuando no está seleccionado
+        onTap: _changePage, // Cambiar de página al hacer tap
         showSelectedLabels: false, // Ocultar etiquetas seleccionadas
         showUnselectedLabels: false, // Ocultar etiquetas no seleccionadas
       ),
