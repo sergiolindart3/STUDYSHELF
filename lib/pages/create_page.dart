@@ -20,7 +20,7 @@ class _CrearProjectState extends State<CrearProject> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _repoLinkController = TextEditingController();
-  String? _selectedSubject;
+  String? _selectedSubject; // categoria
 
   @override
   void dispose() {
