@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:studyshelf/pages/login_page.dart';
-import '../controllers/auth_controller.dart';
-import 'package:studyshelf/pages/widgets/custom_button.dart'; // Asegúrate de tener tus widgets aquí
-import '../pages/widgets/custom_text_field.dart';
+import 'package:studyshelf/pages/auth_pages/ppal_page.dart';
+import 'package:studyshelf/pages/widgets/custom_button.dart';
+import '../../controllers/auth_controller.dart';
+import '../widgets/custom_text_field.dart';
 
-class RegisterPage extends StatelessWidget {
+class LoginPage extends StatelessWidget {
   final AuthController _authController = Get.put(AuthController());
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +28,14 @@ class RegisterPage extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Get.back(); // Volver a la pantalla anterior
+                      Get.to(PpalPage()); // Volver a la pantalla anterior
                     },
                   ),
                   const Expanded(
                     child: Padding(
-                      padding: EdgeInsets.only(left: 65),
+                      padding: EdgeInsets.only(left: 60),
                       child: Text(
-                        'Registrarse',
+                        'Iniciar sesión',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -46,58 +47,38 @@ class RegisterPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 30), // Espacio debajo de la fila
-
-              // Botones de registro con Google
               GoogleButton(onPressed: () {
-                // Lógica para registrarse con Google
+                // Lógica para iniciar sesión con Google
               }),
               const SizedBox(height: 15),
               const Center(
-                child: Text('O', style: TextStyle(color: Colors.grey)),
-              ),
+                  child: Text('O', style: TextStyle(color: Colors.grey))),
               const SizedBox(height: 15),
-
-              // Campos de texto
-              CustomTextField(
-                controller: _nameController,
-                hintText: 'Nombre',
-              ),
-              const SizedBox(height: 15),
-
-              // Campo de texto personalizado para email
               CustomTextField(
                 controller: _emailController,
                 hintText: 'Correo',
               ),
               const SizedBox(height: 15),
-
-              // Campo de texto personalizado para contraseña
               CustomTextField(
                 controller: _passwordController,
                 hintText: 'Contraseña',
                 obscureText: true,
               ),
               const SizedBox(height: 20),
-
-              // Botón de registro
               Obx(() => _authController.isLoading.value
                   ? const Center(child: CircularProgressIndicator())
-                  : _buildRegisterButton(context)),
-              const SizedBox(height: 80),
-
-              // Texto para iniciar sesión
-              Center(
-                child: GestureDetector(
-                  onTap: () => Get.to(
-                      LoginPage()), // Redirige a la página de inicio de sesión
-                  child: const Text(
-                    '¿Ya tienes cuenta? Inicia sesión',
-                    style: TextStyle(
+                  : _buildLoginButton(context)),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  // Lógica para recuperar la contraseña
+                },
+                child: const Text(
+                  '¿Has olvidado tu contraseña?',
+                  style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+                      fontSize: 16),
                 ),
               ),
             ],
@@ -107,16 +88,14 @@ class RegisterPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRegisterButton(BuildContext context) {
+  Widget _buildLoginButton(BuildContext context) {
     return Center(
       child: CustomButton(
-        text: 'Registrarse',
+        text: 'Iniciar Sesión',
         onPressed: () {
-          String name = _nameController.text.trim();
           String email = _emailController.text.trim();
           String password = _passwordController.text.trim();
-          _authController.register(
-              email, password, name); // Lógica para el registro
+          _authController.login(email, password);
         },
       ),
     );

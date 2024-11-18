@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:studyshelf/pages/login_page.dart';
-import 'package:studyshelf/pages/register_page.dart';
+import 'package:studyshelf/pages/auth_pages/login_page.dart';
+import 'package:studyshelf/pages/auth_pages/register_page.dart';
 import 'package:studyshelf/pages/widgets/custom_button.dart';
 import 'package:get/get.dart'; // Importa Get para la navegación
 
@@ -43,11 +43,11 @@ class WelcomeScreen extends StatelessWidget {
                   height: 100,
                 ),
                 SizedBox(height: 10),
-                Text(
+                const Text(
                   "Te damos la bienvenida a",
                   style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
                 ),
-                Text(
+                const Text(
                   "StudyShelf",
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),

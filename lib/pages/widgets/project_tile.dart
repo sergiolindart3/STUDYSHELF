@@ -4,12 +4,20 @@ import 'package:studyshelf/models/project_model.dart';
 class ProjectTile extends StatelessWidget {
   final ProjectModel project;
   final VoidCallback onTap;
+  final bool showStatusIcon; // Nueva propiedad para mostrar/ocultar el icono
 
-  const ProjectTile({Key? key, required this.project, required this.onTap})
-      : super(key: key);
+  const ProjectTile({
+    Key? key,
+    required this.project,
+    required this.onTap,
+    this.showStatusIcon = true, // Por defecto, se muestra el icono
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Determinar si el proyecto está aceptado o pendiente
+    bool isAccepted = project.isActive;
+
     return InkWell(
       onTap: onTap,
       child: Card(
@@ -37,6 +45,13 @@ class ProjectTile extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
+          // Mostrar el ícono de estado solo si `showStatusIcon` es true
+          trailing: showStatusIcon
+              ? Icon(
+                  isAccepted ? Icons.check_circle : Icons.pending,
+                  color: isAccepted ? Colors.green : Colors.orange,
+                )
+              : null,
         ),
       ),
     );

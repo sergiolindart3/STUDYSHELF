@@ -5,6 +5,8 @@ class UserModel {
   final String email;
   final String phone;
   String? imageUrl;
+  String role;
+  bool isAdmin;
 
   // Constructor
   UserModel({
@@ -14,6 +16,8 @@ class UserModel {
     required this.email,
     required this.phone,
     this.imageUrl,
+    required this.role,
+    required this.isAdmin,
   });
 
   // Método para convertir el UserModel a un Map para guardar en Firestore
@@ -25,6 +29,8 @@ class UserModel {
       'email': email,
       'phone': phone,
       'imageUrl': imageUrl,
+      'role': role,
+      'isAdmin': isAdmin,
     };
   }
 
@@ -37,6 +43,8 @@ class UserModel {
       email: data['email'] ?? '',
       phone: data['phone'] ?? '',
       imageUrl: data['imageUrl'],
+      role: data['role'] ?? 'Estudiante',
+      isAdmin: data['isAdmin'] ?? false,
     );
   }
 }

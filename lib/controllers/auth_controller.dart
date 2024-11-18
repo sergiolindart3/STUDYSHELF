@@ -1,4 +1,4 @@
-import '../pages/login_page.dart';
+import '../pages/auth_pages/login_page.dart';
 import 'package:get_storage/get_storage.dart';
 import '../pages/home_page.dart';
 import '../services/firebase_service.dart';
@@ -39,7 +39,7 @@ class AuthController extends GetxController {
     }
   }
 
-  // Método para iniciar sesión
+  // Iniciar sesión
   Future<void> login(String email, String password) async {
     try {
       isLoading.value = true;
@@ -59,7 +59,7 @@ class AuthController extends GetxController {
     }
   }
 
-  // Método para cerrar sesión
+  // Cerrar sesión
   Future<void> signOut() async {
     await _firebaseService.signOut();
     await _clearCredentials(); // Eliminar credenciales guardadas
@@ -113,47 +113,54 @@ class AuthController extends GetxController {
     storage.remove('password');
   }
 
-  // Método para actualizar los datos del perfil del usuario
+  // Actualizar los datos del perfil del usuario
   Future<void> updateUserProfile(
       String name, String lastName, String phone) async {
-    try {
-      String uid = userModel.value!.uid;
+    if (userModel.value != null) {
+      try {
+        String uid = userModel.value!.uid;
+        // Llamar al método del servicio para actualizar los datos en Firestore
+        await _firebaseService.updateUserProfile(uid, name, lastName, phone);
 
-      // Llamar al método del servicio para actualizar los datos en Firestore
-      await _firebaseService.updateUserProfile(uid, name, lastName, phone);
+        // Crear una nueva instancia de UserModel con los datos actualizados
+        UserModel updatedUser = UserModel(
+          uid: userModel.value!.uid,
+          name: name, // Mantener el nombre actual
+          lastName: lastName, // Usar el nuevo apellido
+          phone: phone, // Usar el nuevo teléfono
+          email: userModel.value!.email, // Mantener el correo electrónico
+          imageUrl: userModel.value!.imageUrl, // Mantener la imagen de perfil
+          role: userModel.value!.role, // Mantener el rol
+          isAdmin: userModel.value!.isAdmin, // Mantener el estado de admin
+        );
 
-      // Crear una nueva instancia de UserModel con los datos actualizados
-      UserModel updatedUser = UserModel(
-        uid: userModel.value!.uid,
-        name: name, // Mantener el nombre actual
-        lastName: lastName, // Usar el nuevo apellido
-        phone: phone, // Usar el nuevo teléfono
-        email: userModel.value!.email, // Mantener el correo electrónico
-        imageUrl: userModel.value!.imageUrl, // Mantener la imagen de perfil
-      );
-
-      // Actualizar el estado de userModel con la nueva instancia
-      userModel.value = updatedUser;
-    } catch (e) {
-      Get.snackbar("Error", "No se pudieron actualizar los datos del perfil");
+        // Actualizar el estado de userModel con la nueva instancia
+        userModel.value = updatedUser;
+      } catch (e) {
+        Get.snackbar("Error", "No se pudieron actualizar los datos del perfil");
+      }
     }
   }
 
-// Método para actualizar la imagen de perfil
+  // Método para actualizar la imagen de perfil
   Future<void> updateProfileImage(File imageFile) async {
-    try {
-      String uid = userModel.value!.uid;
-      String? imageUrl =
-          await _firebaseService.uploadProfileImage(uid, imageFile);
+    if (userModel.value != null) {
+      try {
+        String uid = userModel.value!.uid;
+        String? imageUrl =
+            await _firebaseService.uploadProfileImage(uid, imageFile);
 
-      if (imageUrl != null) {
-        await _firebaseService.updateProfileImageUrl(uid, imageUrl);
-        userModel.update((user) {
-          user!.imageUrl = imageUrl;
-        });
+        if (imageUrl != null) {
+          await _firebaseService.updateProfileImageUrl(uid, imageUrl);
+          userModel.update((user) {
+            user!.imageUrl = imageUrl;
+          });
+        } else {
+          Get.snackbar("Error", "No se pudo actualizar la imagen de perfil");
+        }
+      } catch (e) {
+        Get.snackbar("Error", "Error al subir la imagen de perfil");
       }
-    } catch (e) {
-      Get.snackbar("Error", "No se pudo actualizar la imagen de perfil");
     }
   }
 }

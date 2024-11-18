@@ -6,11 +6,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../models/project_model.dart';
 import '../services/project_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProjectController extends GetxController {
   final ProjectService _projectService = ProjectService();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  //final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  RxList<ProjectModel> projectsListByUser = <ProjectModel>[].obs;
 
   var isLoading = false.obs;
   var pdfFile = Rxn<File>();
@@ -19,11 +20,24 @@ class ProjectController extends GetxController {
   var evidenceFilesWeb = <Uint8List>[].obs;
   File? selectedProjectImage; // Nueva variable para la imagen del proyecto
 
-  // Obtener datos de las mascota perdida
+  // Obtener datos de todos los projects
   Stream<List<ProjectModel>> getProjectData() {
-    return _firestore.collection('projects').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => ProjectModel.fromMap(doc)).toList();
-    });
+    return _projectService.getProjectData();
+  }
+
+  // Obtener proyectos de un usuario específico
+  Stream<List<ProjectModel>> getProjectsByUser(String userId) {
+    return _projectService.getUserProjects(userId);
+  }
+
+  //Obtener proyectos aceptados
+  Stream<List<ProjectModel>> getProjectsActive() {
+    return _projectService.getActiveProjects();
+  }
+
+// Obtener proyectos pendientes
+  Stream<List<ProjectModel>> getPendingProjects() {
+    return _projectService.getPendingProjects();
   }
 
   // Método para seleccionar imagen del proyecto
@@ -99,6 +113,8 @@ class ProjectController extends GetxController {
     String description,
     String repoLink,
     String subject,
+    String userId,
+    bool isActive,
   ) async {
     try {
       isLoading.value = true;
@@ -115,9 +131,16 @@ class ProjectController extends GetxController {
 
       // Subir el PDF
       String? pdfUrl;
-      if (pdfFile.value != null || pdfFileWeb.value != null) {
+      if (pdfFile.value != null) {
+        // Para dispositivos móviles, usa uploadFile (para archivos locales)
+        pdfUrl = await _projectService.uploadFile(
+          pdfFile.value!, // Para móvil
+          'projects/$id/pdf',
+        );
+      } else if (pdfFileWeb.value != null) {
+        // Para Web, usa uploadFileWeb (para archivos web)
         pdfUrl = await _projectService.uploadFileWeb(
-          pdfFileWeb.value!,
+          pdfFileWeb.value!, // Para Web
           'projects/$id/pdf',
         );
       }
@@ -136,23 +159,62 @@ class ProjectController extends GetxController {
 
       // Crear y guardar el proyecto
       ProjectModel newProject = ProjectModel(
-        id: id,
-        projectName: projectName,
-        description: description,
-        repoLink: repoLink,
-        pdfFile: pdfUrl,
-        evidenceImages: evidenceUrls,
-        subject: subject,
-        imgProjectUrl:
-            imgProjectUrl, // Guardar la URL de la imagen del proyecto
-      );
+          id: id,
+          projectName: projectName,
+          description: description,
+          repoLink: repoLink,
+          pdfFile: pdfUrl,
+          evidenceImages: evidenceUrls,
+          subject: subject,
+          imgProjectUrl:
+              imgProjectUrl, // Guardar la URL de la imagen del proyecto
+          userId: userId,
+          isActive: isActive);
 
       await _projectService.saveProject(newProject);
       Get.snackbar('Éxito', 'Proyecto guardado exitosamente');
+      clearFields();
     } catch (e) {
       Get.snackbar('Error', 'Hubo un error al guardar el proyecto');
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void clearFields() {
+    pdfFile.value = null;
+    pdfFileWeb.value = null;
+    evidenceFiles.clear();
+    evidenceFilesWeb.clear();
+    selectedProjectImage = null;
+  }
+
+  // Actualizar el estado del proyecto
+  Future<void> updateProjectStatus(String projectId, bool isActive) async {
+    try {
+      isLoading.value = true;
+      await _projectService.updateProjectStatus(projectId, isActive);
+      Get.snackbar(
+          'Éxito', 'El estado del proyecto se actualizó correctamente');
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudo actualizar el estado del proyecto');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Función para eliminar un proyecto
+  Future<void> deleteProject(String projectId, ProjectModel project) async {
+    // Recolectar las rutas de los archivos asociados al proyecto
+    List<String> filePaths = [];
+
+    if (project.imgProjectUrl != null) filePaths.add(project.imgProjectUrl!);
+    if (project.pdfFile != null) filePaths.add(project.pdfFile!);
+    if (project.evidenceImages != null) {
+      filePaths.addAll(project.evidenceImages!);
+    }
+
+    // Llamar al servicio para eliminar el proyecto y los archivos
+    await _projectService.deleteProject(projectId, filePaths);
   }
 }

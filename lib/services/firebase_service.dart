@@ -29,6 +29,8 @@ class FirebaseService {
           lastName: '',
           email: email,
           phone: '',
+          role: 'Estudiante',
+          isAdmin: false,
         );
         await _firestore.collection('users').doc(user.uid).set(newUser.toMap());
         return newUser;

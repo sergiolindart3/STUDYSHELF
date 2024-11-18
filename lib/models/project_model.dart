@@ -9,6 +9,8 @@ class ProjectModel {
   List<String>? evidenceImages;
   final String subject;
   String? imgProjectUrl; // Nueva propiedad para la imagen del proyecto
+  final String userId;
+  bool isActive;
 
   // Constructor
   ProjectModel({
@@ -20,6 +22,8 @@ class ProjectModel {
     this.evidenceImages,
     required this.subject,
     this.imgProjectUrl, // Inicializar en el constructor
+    required this.userId,
+    required this.isActive,
   });
 
   // Método para convertir el ProjectModel a un Map para guardar en Firestore
@@ -33,6 +37,8 @@ class ProjectModel {
       'evidenceImages': evidenceImages,
       'subject': subject,
       'imgProjectUrl': imgProjectUrl, // Incluir en el Map
+      'userId': userId,
+      'isActive': isActive,
     };
   }
 
@@ -48,6 +54,8 @@ class ProjectModel {
       evidenceImages: List<String>.from(data['evidenceImages'] ?? []),
       subject: data['subject'] ?? '',
       imgProjectUrl: data['imgProjectUrl'], // Deserializar la URL de la imagen
+      userId: data['userId'] ?? '',
+      isActive: data['isActive'] ?? '',
     );
   }
 }

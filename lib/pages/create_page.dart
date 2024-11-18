@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:studyshelf/controllers/auth_controller.dart';
 import '../controllers/project_controller.dart';
 import 'package:studyshelf/pages/widgets/custom_button.dart';
 import 'package:studyshelf/pages/widgets/custom_text_field.dart';
@@ -16,11 +17,13 @@ class CrearProject extends StatefulWidget {
 
 class _CrearProjectState extends State<CrearProject> {
   final ProjectController _projectController = Get.put(ProjectController());
+  final AuthController _authController = Get.put(AuthController());
   File? _selectedProjectImage; // Imagen seleccionada para el proyecto
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _repoLinkController = TextEditingController();
   String? _selectedSubject; // categoria
+  bool isActive = false;
 
   @override
   void dispose() {
@@ -46,7 +49,7 @@ class _CrearProjectState extends State<CrearProject> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Todos los Proyectos',
+          'Mis Proyectos',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -82,7 +85,10 @@ class _CrearProjectState extends State<CrearProject> {
             } else {
               return Expanded(
                 child: StreamBuilder<List<ProjectModel>>(
-                  stream: _projectController.getProjectData(),
+                  stream: _authController.userModel.value != null
+                      ? _projectController.getProjectsByUser(
+                          _authController.userModel.value!.uid)
+                      : const Stream.empty(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -182,46 +188,122 @@ class _CrearProjectState extends State<CrearProject> {
               controller: _repoLinkController,
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Obx(() => Text(
+            // Botón de PDF
+            GestureDetector(
+              onTap: _projectController.pickPDF, // Acción de selección de PDF
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 2,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  title: Obx(() => Text(
                         _projectController.pdfFile.value != null
                             ? _projectController.pdfFile.value!.path
                                 .split('/')
                                 .last
                             : 'Selecciona un PDF',
+                        style: const TextStyle(
+                          color: Color.fromARGB(255, 70, 70, 70),
+                        ),
                       )),
+                  trailing: const Icon(
+                    Icons.attach_file,
+                    color: Colors.grey,
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.attach_file),
-                  onPressed: _projectController.pickPDF,
-                ),
-              ],
+              ),
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Obx(() => Wrap(
-                        spacing: 8,
-                        children: _projectController.evidenceFiles.map((file) {
-                          return Chip(
-                            label: Text(file.path.split('/').last),
-                            deleteIcon: const Icon(Icons.close),
-                            onDeleted: () {
-                              _projectController.evidenceFiles.remove(file);
-                            },
-                          );
-                        }).toList(),
-                      )),
+            GestureDetector(
+              onTap: _projectController
+                  .pickEvidence, // Acción para seleccionar evidencias
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 2,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.image),
-                  onPressed: _projectController.pickEvidence,
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  title: Obx(() {
+                    if (_projectController.evidenceFiles.isEmpty) {
+                      return const Text(
+                        "Selecciona evidencias",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 70, 70, 70),
+                        ),
+                      );
+                    } else {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children:
+                              _projectController.evidenceFiles.map((file) {
+                            return Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200], // Fondo gris claro
+                                borderRadius: BorderRadius.circular(
+                                    10), // Bordes redondeados
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 4.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    file.path.split('/').last,
+                                    style: const TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  GestureDetector(
+                                    onTap: () {
+                                      _projectController.evidenceFiles
+                                          .remove(file);
+                                    },
+                                    child: const Icon(
+                                      Icons.close,
+                                      color: Colors.grey,
+                                      size: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    }
+                  }),
+                  trailing: const Icon(
+                    Icons.image,
+                    color: Colors.grey,
+                  ),
                 ),
-              ],
+              ),
             ),
+
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
@@ -246,6 +328,7 @@ class _CrearProjectState extends State<CrearProject> {
                 labelText: 'Asignatura',
               ),
               dropdownColor: Colors.white,
+              value: _selectedSubject, // Aquí asignas el valor persistente
               items: const [
                 DropdownMenuItem(
                   child: Text('PROGRAMACION'),
@@ -270,6 +353,7 @@ class _CrearProjectState extends State<CrearProject> {
             CustomButton(
               text: "Subir Proyecto",
               onPressed: () {
+                final userId = _authController.userModel.value!.uid;
                 if (_nameController.text.isNotEmpty &&
                     _descriptionController.text.isNotEmpty &&
                     _repoLinkController.text.isNotEmpty &&
@@ -279,6 +363,8 @@ class _CrearProjectState extends State<CrearProject> {
                     _descriptionController.text,
                     _repoLinkController.text,
                     _selectedSubject!,
+                    userId,
+                    isActive,
                   );
 
                   _nameController.clear();

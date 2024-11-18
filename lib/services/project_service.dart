@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart'; // Para kIsWeb
 import 'package:studyshelf/models/project_model.dart';
 
@@ -48,10 +47,76 @@ class ProjectService {
     }
   }
 
-  // Obtener datos de los proyectos
+  // Obtener datos de todos los proyectos
   Stream<List<ProjectModel>> getProjectData() {
     return _firestore.collection('projects').snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => ProjectModel.fromMap(doc)).toList();
     });
+  }
+
+  // Obtener proyectos por userId
+  Stream<List<ProjectModel>> getUserProjects(String userId) {
+    return _firestore
+        .collection('projects')
+        .where('userId', isEqualTo: userId) // Filtrar por userId
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => ProjectModel.fromMap(doc)).toList();
+    });
+  }
+
+  // Obtener proyectos aceptados
+  Stream<List<ProjectModel>> getActiveProjects() {
+    return _firestore
+        .collection('projects')
+        .where('isActive', isEqualTo: true) // Filtrar por isActive
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => ProjectModel.fromMap(doc)).toList();
+    });
+  }
+
+  // Actualizar el estado del proyecto en Firestore
+  Future<void> updateProjectStatus(String projectId, bool isActive) async {
+    try {
+      await _firestore.collection('projects').doc(projectId).update({
+        'isActive': isActive, // Actualizar el campo isActive
+      });
+    } catch (e) {
+      print("Error al actualizar el estado del proyecto: $e");
+    }
+  }
+
+  // Obtener proyectos pendientes (isActive == false)
+  Stream<List<ProjectModel>> getPendingProjects() {
+    return _firestore
+        .collection('projects')
+        .where('isActive', isEqualTo: false) // Filtrar por pendientes
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => ProjectModel.fromMap(doc)).toList();
+    });
+  }
+
+  // Eliminar un proyecto y sus archivos
+  Future<void> deleteProject(String projectId, List<String>? filePaths) async {
+    try {
+      // Eliminar el documento de Firestore
+      await _firestore.collection('projects').doc(projectId).delete();
+
+      // Eliminar los archivos en Firebase Storage
+      if (filePaths != null && filePaths.isNotEmpty) {
+        for (var path in filePaths) {
+          try {
+            await _storage.refFromURL(path).delete();
+          } catch (e) {
+            print("Error al eliminar archivo $path: $e");
+          }
+        }
+      }
+    } catch (e) {
+      print("Error al eliminar proyecto: $e");
+      rethrow;
+    }
   }
 }
