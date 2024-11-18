@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyshelf/pages/auth_pages/ppal_page.dart';
+import 'package:studyshelf/pages/auth_pages/register_page.dart';
 import 'package:studyshelf/pages/widgets/custom_button.dart';
 import '../../controllers/auth_controller.dart';
 import '../widgets/custom_text_field.dart';
@@ -70,11 +71,9 @@ class LoginPage extends StatelessWidget {
                   : _buildLoginButton(context)),
               const SizedBox(height: 20),
               GestureDetector(
-                onTap: () {
-                  // Lógica para recuperar la contraseña
-                },
+                onTap: () => Get.to(RegisterPage()),
                 child: const Text(
-                  '¿Has olvidado tu contraseña?',
+                  '¿No tienes cuenta? Registrate',
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,

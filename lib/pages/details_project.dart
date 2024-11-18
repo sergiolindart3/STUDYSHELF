@@ -42,6 +42,13 @@ class DetailsProject extends StatelessWidget {
                     project.imgProjectUrl!,
                     height: 150,
                     fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.broken_image,
+                        size: 50,
+                        color: Colors.grey,
+                      );
+                    },
                   ),
                 ),
               ),
@@ -160,6 +167,13 @@ class DetailsProject extends StatelessWidget {
                                   evidenceUrl,
                                   fit: BoxFit.cover,
                                   width: MediaQuery.of(context).size.width,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.broken_image,
+                                      size: 50,
+                                      color: Colors.grey,
+                                    );
+                                  },
                                 ),
                               ),
                             ),

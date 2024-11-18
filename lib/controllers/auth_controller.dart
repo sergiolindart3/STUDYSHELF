@@ -10,13 +10,17 @@ class AuthController extends GetxController {
   final FirebaseService _firebaseService = FirebaseService();
   var isLoading = false.obs; // Observa si se está cargando una operación
   var userModel = Rxn<UserModel>(); // Observa el estado del UserModel
-  final storage =
-      GetStorage(); // Crear una instancia de GetStorage para almacenar las credenciales
+  final storage = GetStorage(); // Crear una instancia de GetStorage
+  final bool autoLogin;
+
+  AuthController({this.autoLogin = true});
 
   @override
   void onInit() {
     super.onInit();
-    _autoLogin(); // Intentar login automático al iniciar
+    if (autoLogin) {
+      _autoLogin(); // Solo intenta iniciar sesión si autoLogin es true
+    }
   }
 
   // Registrar Usuario

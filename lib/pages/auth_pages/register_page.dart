@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyshelf/pages/auth_pages/login_page.dart';
+import 'package:studyshelf/pages/auth_pages/ppal_page.dart';
 import '../../controllers/auth_controller.dart';
 import 'package:studyshelf/pages/widgets/custom_button.dart'; // Asegúrate de tener tus widgets aquí
 import '../widgets/custom_text_field.dart';
 
 class RegisterPage extends StatelessWidget {
-  final AuthController _authController = Get.put(AuthController());
+  final AuthController _authController =
+      Get.put(AuthController(autoLogin: false));
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -27,7 +29,7 @@ class RegisterPage extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Get.back(); // Volver a la pantalla anterior
+                      Get.to(PpalPage()); // Volver a la pantalla anterior
                     },
                   ),
                   const Expanded(
@@ -83,13 +85,12 @@ class RegisterPage extends StatelessWidget {
               Obx(() => _authController.isLoading.value
                   ? const Center(child: CircularProgressIndicator())
                   : _buildRegisterButton(context)),
-              const SizedBox(height: 80),
+              const SizedBox(height: 20),
 
               // Texto para iniciar sesión
               Center(
                 child: GestureDetector(
-                  onTap: () => Get.to(
-                      LoginPage()), // Redirige a la página de inicio de sesión
+                  onTap: () => Get.to(LoginPage()),
                   child: const Text(
                     '¿Ya tienes cuenta? Inicia sesión',
                     style: TextStyle(

@@ -35,6 +35,13 @@ class ProjectTile extends StatelessWidget {
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.broken_image,
+                        size: 50,
+                        color: Colors.grey,
+                      );
+                    },
                   ),
                 )
               : const Icon(Icons.image, size: 50),
