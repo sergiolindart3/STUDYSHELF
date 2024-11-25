@@ -100,10 +100,7 @@ class ProjectController extends GetxController {
       // Móvil: usar ImagePicker
       final picker = ImagePicker();
       final pickedFiles = await picker.pickMultiImage();
-      if (pickedFiles != null) {
-        evidenceFiles.value =
-            pickedFiles.map((file) => File(file.path)).toList();
-      }
+      evidenceFiles.value = pickedFiles.map((file) => File(file.path)).toList();
     }
   }
 
